@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1613995989 source:d:\faculty\third year - second semester\gpc\homeworks\firsthomework\main.cpp
+	<GL/glut.h>
+	<stdlib.h>
+	<stdio.h>
+	<math.h>
+

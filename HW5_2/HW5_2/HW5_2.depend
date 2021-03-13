@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1615647894 source:d:\faculty\third year - second semester\gpc\homeworks\hw5_2\hw5_2\main.cpp
+	<stdlib.h>
+	<stdio.h>
+	<math.h>
+	<assert.h>
+	<float.h>
+	<GL/glut.h>
+

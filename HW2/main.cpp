@@ -153,9 +153,6 @@ void Display5() {
    double pi = 4 * atan(1);
    double a = 0.2;
 
-
-
-
    //cadran
 
     double tmax = -0.58;
@@ -175,7 +172,6 @@ void Display5() {
    }
    glVertex2d(x2, y1);
    glEnd();
-
 
    //desenam primul set de triunghiuri t in (-pi/2 + 0.005 * 14, -1.3)
    tmax = -1.3;

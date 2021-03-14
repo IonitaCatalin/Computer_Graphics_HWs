@@ -5,15 +5,14 @@
 #include <math.h>
 #include <assert.h>
 #include <float.h>
-
 #include <GL/glut.h>
+#include <time.h>
 
 // dimensiunea ferestrei in pixeli
 #define dim 300
 
 unsigned char prevKey;
 int nivel = 0;
-
 
 class C2coord
 {
@@ -357,22 +356,99 @@ public:
 class CSierpinski
 {
 public:
-    void sierpinskiCarpet(double lungime, int nivel, CPunct &p, CVector &v)
+    void sierpinskiCarpet(double lungime, int nivel, int nivelmax, CPunct &p, CVector &v)
     {
         if (nivel == 0)
         {
         }
+        else if(nivel == nivelmax){
+            patrat(p, v, lungime);
+            sierpinskiCarpet(lungime, nivel-1, nivelmax, p, v);
+        }
         else
         {
-        /*
+
           double x,y;
-          p.getxy(x,y);
-          patrat(p,v,lungime);
-          y = (double)(y + lungime);
-          p = CPunct(x,y);
-          sierpinskiCarpet(lungime/3,nivel - 1,p,v);
-          patrat(p,v,lungime);
-          */
+          p.getxy(x, y);
+
+
+          double x_temp, y_temp;
+          CPunct p_temp;
+
+          //N
+          y_temp = y + lungime;
+          x_temp = x;
+          p_temp = CPunct(x_temp, y_temp);
+
+
+
+          patrat(p_temp, v, lungime/3);
+          sierpinskiCarpet(lungime/3, nivel - 1, nivel, p_temp, v);
+
+          //NE
+          y_temp = y + lungime;
+          x_temp = x + lungime;
+          p_temp = CPunct(x_temp, y_temp);
+
+          patrat(p_temp, v, lungime/3);
+          sierpinskiCarpet(lungime/3, nivel - 1, nivel, p_temp, v);
+
+          //E
+          y_temp = y;
+          x_temp = x + lungime;
+          p_temp = CPunct(x_temp, y_temp);
+
+          patrat(p_temp, v, lungime/3);
+          sierpinskiCarpet(lungime/3, nivel - 1, nivel, p_temp, v);
+
+          //SE
+          y_temp = y - lungime;
+          x_temp = x + lungime;
+          p_temp = CPunct(x_temp, y_temp);
+
+          patrat(p_temp, v, lungime/3);
+          sierpinskiCarpet(lungime/3, nivel - 1, nivel, p_temp, v);
+
+          //S
+          y_temp = y - lungime;
+          x_temp = x;
+          p_temp = CPunct(x_temp, y_temp);
+
+          patrat(p_temp, v, lungime/3);
+          sierpinskiCarpet(lungime/3, nivel - 1, nivel, p_temp, v);
+
+          //SW
+          y_temp = y - lungime;
+          x_temp = x - lungime;
+          p_temp = CPunct(x_temp, y_temp);
+
+          patrat(p_temp, v, lungime/3);
+          sierpinskiCarpet(lungime/3, nivel - 1, nivel, p_temp, v);
+
+          //W
+          y_temp = y;
+          x_temp = x - lungime;
+          p_temp = CPunct(x_temp, y_temp);
+
+          patrat(p_temp, v, lungime/3);
+          sierpinskiCarpet(lungime/3, nivel - 1, nivel, p_temp, v);
+
+          //W
+          y_temp = y;
+          x_temp = x - lungime;
+          p_temp = CPunct(x_temp, y_temp);
+
+          patrat(p_temp, v, lungime/3);
+          sierpinskiCarpet(lungime/3, nivel - 1, nivel, p_temp, v);
+
+          //NW
+          y_temp = y + lungime;
+          x_temp = x - lungime;
+          p_temp = CPunct(x_temp, y_temp);
+
+          patrat(p_temp, v, lungime/3);
+          sierpinskiCarpet(lungime/3, nivel - 1, nivel, p_temp, v);
+
         }
     }
     void patrat(CPunct &cent,CVector &dir,double dist)
@@ -406,11 +482,72 @@ public:
     {
         CVector v(0.0, 1.0);
         CPunct p(0.0, 0.0);
-        //patrat(p,v,lungime);
-        sierpinskiCarpet(lungime, nivel, p, v);
+        patrat(p,v,lungime*3);
+        sierpinskiCarpet(lungime, nivel, nivel, p, v);
     }
 };
 
+
+class CArboreRand
+{
+public:
+  void arborePerron(double lungime,
+                    int nivel,
+                    double factordiviziune,
+                    CPunct p,
+                    CVector v)
+  {
+    assert(factordiviziune != 0);
+    CPunct p1, p2;
+    if (nivel == 0)
+    {
+    }
+    else
+    {
+      v.rotatie(-45);
+      v.deseneaza(p, lungime);
+      p1 = v.getDest(p, lungime);
+      arborePerron(lungime * factordiviziune, nivel - 1, factordiviziune, p1, v);
+
+      v.rotatie(90);
+      v.deseneaza(p, lungime);
+      p1 = v.getDest(p, lungime);
+      p2 = p1;
+
+      v.rotatie(15);
+      v.deseneaza(p1, lungime);
+      p1 = v.getDest(p1, lungime);
+      arborePerron(lungime * factordiviziune, nivel - 1, factordiviziune, p1, v);
+
+      p1 = p2;
+      v.rotatie(-60);
+      v.deseneaza(p1, lungime);
+      p1 = v.getDest(p1, lungime);
+      p2 = p1;
+
+      v.rotatie(30);
+      v.deseneaza(p1, lungime/2);
+      p1 = v.getDest(p1, lungime/2);
+      arborePerron(lungime * factordiviziune, nivel - 1, factordiviziune, p1, v);
+
+      p1 = p2;
+      v.rotatie(-120);
+      v.deseneaza(p1, lungime/2);
+      p1 = v.getDest(p1, lungime/2);
+      arborePerron(lungime * factordiviziune, nivel - 1, factordiviziune, p1, v);
+    }
+  }
+
+  void afisare(double lungime, int nivel)
+  {
+    CVector v(0.0, -1.0);
+    CPunct p(0.0, 1.0);
+
+    v.deseneaza(p, 0.25);
+    p = v.getDest(p, 0.25);
+    arborePerron(lungime, nivel, 0.4, p, v);
+  }
+};
 
 
 // afisare curba lui Koch "fulg de zapada"
@@ -596,6 +733,44 @@ void Display5() {
   nivel++;
 }
 
+// afisare arbore rand
+void Display6() {
+  CArboreRand car;
+
+  char c[3];
+  sprintf(c, "%2d", nivel);
+  glRasterPos2d(-0.98,-0.98);
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'N');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'v');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'l');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, '=');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[0]);
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[1]);
+
+  glRasterPos2d(-1.0,0.9);
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'b');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'o');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, ' ');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'n');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'd');
+
+  glPushMatrix();
+  glLoadIdentity();
+  glScaled(0.4, 0.4, 1);
+  glTranslated(-0.5, 0.5, 0.0);
+  car.afisare(1, nivel);
+  glPopMatrix();
+  nivel++;
+}
+
 void Init(void) {
 
    glClearColor(1.0,1.0,1.0,1.0);
@@ -636,6 +811,10 @@ void Display(void)
       glClear(GL_COLOR_BUFFER_BIT);
       Display5();
       break;
+    case '6':
+      glClear(GL_COLOR_BUFFER_BIT);
+      Display6();
+      break;
     default:
       break;
   }
@@ -662,6 +841,7 @@ void MouseFunc(int button, int state, int x, int y)
 
 int main(int argc, char** argv)
 {
+
   glutInit(&argc, argv);
 
   glutInitWindowSize(dim, dim);

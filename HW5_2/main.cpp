@@ -478,6 +478,40 @@ public:
 
 
     }
+    void curba(int ordin,double lungime,int unghi,CVector &dir,CPunct &cent)
+    {
+        if(ordin == 0)
+        {
+            dir.deseneaza(cent,lungime);
+            cent = dir.getDest(cent,lungime);
+        }
+        else
+        {
+            curba(ordin - 1,lungime / 2,-unghi,dir,cent);
+            dir.rotatie(unghi);
+            curba(ordin - 1,lungime / 2,unghi,dir,cent);
+            dir.rotatie(unghi);
+            curba(ordin - 1, lungime / 2,-unghi,dir,cent);
+        }
+    }
+    void curbaSierpinski(int ordin,double lungime,CVector &dir,CPunct &cent)
+    {
+        if(ordin % 2 ==0 )
+        {
+            curba(ordin,lungime,60,dir,cent);
+        }
+        else
+        {
+            dir.rotatie(60);
+            curba(ordin,lungime,-60,dir,cent);
+        }
+    }
+    void afisareCurba(double lungime,int nivel)
+    {
+        CVector v(0.0,1.0);
+        CPunct p(0.5,-0.);
+        curbaSierpinski(nivel,lungime,v,p);
+    }
     void afisare(double lungime, int nivel)
     {
         CVector v(0.0, 1.0);
@@ -771,6 +805,53 @@ void Display6() {
   nivel++;
 }
 
+void Display7() {
+  CSierpinski spkc;
+
+
+  char c[3];
+  sprintf(c, "%2d", nivel);
+  glRasterPos2d(-0.98,-0.98);
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'N');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'v');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'l');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, '=');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[0]);
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[1]);
+
+  glRasterPos2d(-1.0,0.9);
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'C');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'u');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'b');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, ' ');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'S');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'p');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'n');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 's');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'k');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
+
+
+  glPushMatrix();
+  glLoadIdentity();
+  glScaled(0.4, 0.4, 1);
+  glTranslated(-0.5, 0.5, 0.0);
+  spkc.afisareCurba(1, nivel);
+  glPopMatrix();
+  nivel++;
+}
+
 void Init(void) {
 
    glClearColor(1.0,1.0,1.0,1.0);
@@ -814,6 +895,10 @@ void Display(void)
     case '6':
       glClear(GL_COLOR_BUFFER_BIT);
       Display6();
+      break;
+    case '7':
+      glClear(GL_COLOR_BUFFER_BIT);
+      Display7();
       break;
     default:
       break;

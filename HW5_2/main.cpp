@@ -509,7 +509,7 @@ public:
     void afisareCurba(double lungime,int nivel)
     {
         CVector v(0.0,1.0);
-        CPunct p(0.5,-0.);
+        CPunct p(0.5,-0.5);
         curbaSierpinski(nivel,lungime,v,p);
     }
     void afisare(double lungime, int nivel)
@@ -784,7 +784,7 @@ void Display6() {
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[1]);
 
   glRasterPos2d(-1.0,0.9);
-  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'A');
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'b');
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'o');
@@ -795,6 +795,12 @@ void Display6() {
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'n');
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'd');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'o');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'm');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'z');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
+  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 't');
 
   glPushMatrix();
   glLoadIdentity();
@@ -827,8 +833,6 @@ void Display7() {
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'b');
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
-  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
-  glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, ' ');
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'S');
   glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
@@ -845,9 +849,9 @@ void Display7() {
 
   glPushMatrix();
   glLoadIdentity();
-  glScaled(0.4, 0.4, 1);
-  glTranslated(-0.5, 0.5, 0.0);
-  spkc.afisareCurba(1, nivel);
+  //glScaled(0.4, 0.4, 1);
+  glTranslated(-0.5, 0.2, 0.0);
+  spkc.afisareCurba(1.0 , nivel);
   glPopMatrix();
   nivel++;
 }

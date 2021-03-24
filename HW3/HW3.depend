@@ -1,9 +1,10 @@
 # depslib dependency file v1.0
-1616260019 source:d:\faculty\third year - second semester\gpc\homeworks\gpc_homeworks\hw3\main.cpp
+1616620950 source:d:\faculty\third year - second semester\gpc\homeworks\gpc_homeworks\hw3\main.cpp
 	<iostream>
 	<GL/glut.h>
 	<stdlib.h>
 	<stdio.h>
 	<math.h>
 	<vector>
+	<math.h>
 

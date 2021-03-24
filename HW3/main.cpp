@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <vector>
+#include <math.h>
 
 #define dimension 300
 
@@ -16,36 +17,48 @@ public:
     GrilaCarteziana(int cols,int rows){
         this->rows = rows;
         this->cols = cols;
+        this->c0 = -1.0;
+        this->l0 = -1.0;
 
     }
     GrilaCarteziana(){
         this->cols = 10;
         this->rows = 10;
+        this->c0 = -1.0;
+        this->l0 = -1.0;
+
     }
-    void draw(int width,int height){
-        for(int i=0;i < this->rows ;++i){
-            vector<int> row;
-            for(int j=0;j < this->cols;++j){
-                row.push_back(0);
-            }
-            pixels.push_back(row);
+    void writePixel(){
+
+    }
+    void drawCartGrid(){
+        double c1 = this->c0 + (double)(this->cols) - 1.0;
+        double l1 = this->l0 + (double)this->rows - 1.0;
+
+        double dl = (double)((2.0-2.0*this->epsilon)/((double)(this->rows) - 1.0));
+        double dc = (double)((2.0-2.0*this->epsilon)/((double)(this->cols) - 1.0));
+
+
+        for(int i = 0;i < this->cols;i++){
+            glColor3f(0.2,0.15,0.8);
+            glBegin(GL_LINE_STRIP);
+            glVertex2f(-1.0 + this->epsilon + i * dc,-1.0 + this->epsilon);
+            glVertex2f(-1.0 + this->epsilon + i * dc,1.0 - this->epsilon);
+            glEnd();
         }
-        double widthDistance,heightDistance;
-        widthDistance = (double)(width)/(double)(this->cols);
-        heightDistance = (double)(height)/double(this->rows);
-
-        widthDistance = widthDistance < heightDistance ? widthDistance : heightDistance;
-        heightDistance = heightDistance < widthDistance ? heightDistance : widthDistance ;
-
-        double widthScale = -1 + (2/(widthDistance*this->cols))*(widthDistance);
-        double heightScale = -1 + (2/(heightDistance*this->rows))*(heightDistance);
-
-        cout<<widthScale<<" "<<heightScale<<endl;
+        for(int i = 0;i < this->rows;i++){
+            glColor3f(0.2,0.15,0.8);
+            glBegin(GL_LINE_STRIP);
+            glVertex2f(-1.0 + this->epsilon ,-1.0 + this->epsilon + i*dl);
+            glVertex2f(1.0 - this->epsilon ,-1.0 + this->epsilon + i*dl);
+            glEnd();
+        }
 
     }
     void setCols(int cols){
         this->cols=cols;
     }
+
     void setRows(int rows){
         this->rows=rows;
     }
@@ -54,6 +67,9 @@ public:
 private:
     int cols;
     int rows;
+    double c0;
+    double l0;
+    double epsilon = 0.03;
     vector<vector<int>> pixels;
 };
 
@@ -62,7 +78,7 @@ GrilaCarteziana gc;
 
 void Init(void) {
    glClearColor(1.0,1.0,1.0,1.0);
-   glLineWidth(3);
+   glLineWidth(1);
    glPointSize(4);
    glPolygonMode(GL_FRONT, GL_LINE);
 }
@@ -70,13 +86,13 @@ void Init(void) {
 void Display(void) {
    glClear(GL_COLOR_BUFFER_BIT);
 
-   gc.draw(dimension,dimension);
+   gc.drawCartGrid();
    glFlush();
 }
 
 void Reshape(int w, int h) {
    printf("Call Reshape : latime = %d, inaltime = %d\n", w, h);
-   gc.draw(w,h);
+   gc.drawCartGrid();
    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 }
 
@@ -99,8 +115,8 @@ void MouseFunc(int button, int state, int x, int y) {
 
 int main(int argc, char** argv) {
 
-   gc.setCols(9);
-   gc.setRows(9);
+   gc.setCols(12);
+   gc.setRows(12);
 
    glutInit(&argc, argv);
 

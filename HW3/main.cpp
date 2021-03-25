@@ -17,26 +17,38 @@ public:
     GrilaCarteziana(int cols,int rows){
         this->rows = rows;
         this->cols = cols;
-        this->c0 = -1.0;
-        this->l0 = -1.0;
+        this->initPixels(cols,rows);
 
     }
     GrilaCarteziana(){
         this->cols = 10;
         this->rows = 10;
-        this->c0 = -1.0;
-        this->l0 = -1.0;
+        this->initPixels(this->cols,this->rows);
 
     }
-    void writePixel(){
+    void writePixel(int x,int y){
+        double dl = (double)((2.0-2.0*this->epsilon)/((double)(this->rows) - 1.0));
+        double dc = (double)((2.0-2.0*this->epsilon)/((double)(this->cols) - 1.0));
+
+        double cx = -1.0 + this->epsilon + x*dc;
+        double cy = -1.0 + this->epsilon + y*dl;
+
+        double xGL = cx + x*dc;
+        double yGL = cy + y*dl;
+
+        glColor3f(0.2,0.15,0.8);
+        glBegin(GL_LINE_STRIP);
+        glVertex2f(0.0,0.0);
+        glVertex2f(xGL,yGL);
+        glEnd();
 
     }
     void drawCartGrid(){
         double c1 = this->c0 + (double)(this->cols) - 1.0;
         double l1 = this->l0 + (double)this->rows - 1.0;
 
-        double dl = (double)((2.0-2.0*this->epsilon)/((double)(this->rows) - 1.0));
-        double dc = (double)((2.0-2.0*this->epsilon)/((double)(this->cols) - 1.0));
+        double dl = (double)((2.0-2.0*this->epsilon)/(double)(this->rows - 1));
+        double dc = (double)((2.0-2.0*this->epsilon)/(double)(this->cols - 1));
 
 
         for(int i = 0;i < this->cols;i++){
@@ -46,15 +58,17 @@ public:
             glVertex2f(-1.0 + this->epsilon + i * dc,1.0 - this->epsilon);
             glEnd();
         }
-        for(int i = 0;i < this->rows;i++){
+        for(int j = 0;j < this->rows;j++){
             glColor3f(0.2,0.15,0.8);
             glBegin(GL_LINE_STRIP);
-            glVertex2f(-1.0 + this->epsilon ,-1.0 + this->epsilon + i*dl);
-            glVertex2f(1.0 - this->epsilon ,-1.0 + this->epsilon + i*dl);
+            glVertex2f(-1.0 + this->epsilon ,-1.0 + this->epsilon + j*dl);
+            glVertex2f(1.0 - this->epsilon ,-1.0 + this->epsilon + j*dl);
             glEnd();
         }
+        this->writePixel(6,6);
 
     }
+
     void setCols(int cols){
         this->cols=cols;
     }
@@ -67,10 +81,20 @@ public:
 private:
     int cols;
     int rows;
-    double c0;
-    double l0;
+    double c0 = -1.0;
+    double l0 = -1.0;
     double epsilon = 0.03;
-    vector<vector<int>> pixels;
+    vector<vector<bool>> pixels;
+    void initPixels(int cols,int rows){
+        for(int i = 0;i < rows;++i)
+        {
+            vector<bool> values;
+            for(int j=0; j < cols;++j){
+                values.push_back(false);
+            }
+            pixels.push_back(values);
+        }
+    }
 };
 
 GrilaCarteziana gc;
@@ -115,8 +139,8 @@ void MouseFunc(int button, int state, int x, int y) {
 
 int main(int argc, char** argv) {
 
-   gc.setCols(12);
-   gc.setRows(12);
+   gc.setCols(5);
+   gc.setRows(5);
 
    glutInit(&argc, argv);
 

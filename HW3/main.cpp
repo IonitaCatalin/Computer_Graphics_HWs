@@ -5,6 +5,7 @@
 #include <math.h>
 #include <vector>
 #include <math.h>
+#include <utility>
 
 #define dimension 300
 
@@ -14,59 +15,125 @@ unsigned char prevKey;
 
 class GrilaCarteziana{
 public:
-    GrilaCarteziana(int cols,int rows){
+    GrilaCarteziana(int cols, int rows){
         this->rows = rows;
         this->cols = cols;
-        this->initPixels(cols,rows);
 
     }
+
     GrilaCarteziana(){
         this->cols = 10;
         this->rows = 10;
-        this->initPixels(this->cols,this->rows);
 
     }
-    void writePixel(int x,int y){
-        double dl = (double)((2.0-2.0*this->epsilon)/((double)(this->rows) - 1.0));
-        double dc = (double)((2.0-2.0*this->epsilon)/((double)(this->cols) - 1.0));
 
-        double cx = -1.0 + this->epsilon + x*dc;
-        double cy = -1.0 + this->epsilon + y*dl;
+    void writePixel(int row, int col){
 
-        double xGL = cx + x*dc;
-        double yGL = cy + y*dl;
+        this->pixels.push_back(pair<int,int>(row,col));
+        pair<int,int> coord = this->transformPixels(row,this->cols - col);
 
-        glColor3f(0.2,0.15,0.8);
-        glBegin(GL_LINE_STRIP);
-        glVertex2f(0.0,0.0);
-        glVertex2f(xGL,yGL);
-        glEnd();
-
+        int points = 100;
+        float angle = 2.0f * 3.1416f / points;
+        for(auto pixel:pixels) {
+            glColor3f(1.0, 0.0, 0.0);
+            glMatrixMode(GL_MODELVIEW);
+            glPushMatrix();
+            glLoadIdentity();
+            glBegin(GL_POLYGON);
+            double angle1 = 0.0;
+            double radius = this->gridSpacing*0.4;
+            glVertex2d(coord.first , coord.second);
+            for (int i = 0; i < points; ++i)
+            {
+                glVertex2d(radius * cos(angle1) + coord.first, radius * sin(angle1) + coord.second);
+                angle1 += angle;
+            }
+            glEnd();
+            glPopMatrix();
+        }
     }
+
     void drawCartGrid(){
-        double c1 = this->c0 + (double)(this->cols) - 1.0;
-        double l1 = this->l0 + (double)this->rows - 1.0;
 
-        double dl = (double)((2.0-2.0*this->epsilon)/(double)(this->rows - 1));
-        double dc = (double)((2.0-2.0*this->epsilon)/(double)(this->cols - 1));
-
-
-        for(int i = 0;i < this->cols;i++){
-            glColor3f(0.2,0.15,0.8);
-            glBegin(GL_LINE_STRIP);
-            glVertex2f(-1.0 + this->epsilon + i * dc,-1.0 + this->epsilon);
-            glVertex2f(-1.0 + this->epsilon + i * dc,1.0 - this->epsilon);
+        int colsNo = 0;
+        for(int x = this->originx; x <= this->originx + this->cols*gridSpacing && colsNo<=this->cols ;x+=gridSpacing){
+            glColor3f(1.0,0.0,0.0);
+            glBegin(GL_LINES);
+                glVertex2i(x,this->originy);
+                glVertex2i(x,this->originy + gridSpacing*this->cols);
             glEnd();
+            colsNo++;
         }
-        for(int j = 0;j < this->rows;j++){
-            glColor3f(0.2,0.15,0.8);
-            glBegin(GL_LINE_STRIP);
-            glVertex2f(-1.0 + this->epsilon ,-1.0 + this->epsilon + j*dl);
-            glVertex2f(1.0 - this->epsilon ,-1.0 + this->epsilon + j*dl);
-            glEnd();
-        }
-        this->writePixel(6,6);
 
+        int rowsNo = 0;
+        for(int y = this->originy; y <= this->originy + this->rows*gridSpacing && rowsNo<= this->rows ;y+=gridSpacing){
+            glColor3f(1.0,0.0,0.0);
+            glBegin(GL_LINES);
+                glVertex2i(this->originx,y);
+                glVertex2i(this->originx + gridSpacing*this->rows,y);
+            glEnd();
+            rowsNo++;
+        }
+
+    }
+    void drawSegmentLine3A(int x0, int y0, int xn, int yn) {
+
+        int dx = xn - x0, dy = yn - y0;
+
+        int d = 2* dy - dx;
+        int dE = 2 * dy;
+        int dNE = 2 * (dy - dx);
+
+        int x = x0,y = y0;
+
+        this->writePixel(x,y);
+
+        while(x < xn){
+            if (d <= 0) {
+                d += dE;
+                x++;
+            }
+            else {
+                d += dNE;
+                x++;
+                y++;
+            }
+            this->writePixel(x,y);
+        }
+    }
+
+    void drawSegmentLine3B(int x0, int y0, int xn, int yn) {
+
+        int dx = xn - x0, dy = yn - y0;
+
+        int d = 2* dy - dx;
+        int dE = 2 * dy;
+        int dSE = 2 * (dy - dx);
+
+        int x = x0,y = y0;
+        this->writePixel(x,y);
+
+        while(x < xn){
+
+            if(d >= 0){
+                d += dE;
+                x++;
+            }
+            else{
+                d -= dSE;
+                x++;
+                y--;
+            }
+            this->writePixel(x,y);
+        }
+    }
+
+
+    pair<int,int> transformPixels(int i,int j){
+        int xi = this->originx + this->gridSpacing * i;
+        int yj = this->originy + this->gridSpacing * j;
+
+        return pair<int,int>(xi,yj);
     }
 
     void setCols(int cols){
@@ -81,23 +148,12 @@ public:
 private:
     int cols;
     int rows;
-    double c0 = -1.0;
-    double l0 = -1.0;
-    double epsilon = 0.03;
-    vector<vector<bool>> pixels;
-    void initPixels(int cols,int rows){
-        for(int i = 0;i < rows;++i)
-        {
-            vector<bool> values;
-            for(int j=0; j < cols;++j){
-                values.push_back(false);
-            }
-            pixels.push_back(values);
-        }
-    }
-};
+    int gridSpacing = min(glutGet(GLUT_WINDOW_WIDTH),glutGet(GLUT_WINDOW_HEIGHT))*0.05 ;
+    double originx = glutGet(GLUT_WINDOW_WIDTH)/8;
+    double originy = glutGet(GLUT_WINDOW_HEIGHT)/8;
+    vector<pair<int,int>> pixels;
 
-GrilaCarteziana gc;
+};
 
 
 void Init(void) {
@@ -108,16 +164,23 @@ void Init(void) {
 }
 
 void Display(void) {
+   GrilaCarteziana gc;
+   gc.setCols(15);
+   gc.setRows(15);
    glClear(GL_COLOR_BUFFER_BIT);
-
    gc.drawCartGrid();
+   gc.drawSegmentLine3B(0,15,15,10);
+   gc.drawSegmentLine3A(0,0,15,7);
    glFlush();
 }
 
 void Reshape(int w, int h) {
-   printf("Call Reshape : latime = %d, inaltime = %d\n", w, h);
-   gc.drawCartGrid();
    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   double windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+   double windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+   glOrtho(0.0f, windowWidth, windowHeight, 0.0f, 0.0f, 1.0f);
 }
 
 
@@ -138,9 +201,6 @@ void MouseFunc(int button, int state, int x, int y) {
 }
 
 int main(int argc, char** argv) {
-
-   gc.setCols(5);
-   gc.setRows(5);
 
    glutInit(&argc, argv);
 

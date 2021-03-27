@@ -35,7 +35,7 @@ public:
         int points = 100;
         float angle = 2.0f * 3.1416f / points;
         for(auto pixel:pixels) {
-            glColor3f(1.0, 0.0, 0.0);
+            glColor3f(0.4, 0.4, 0.4);
             glMatrixMode(GL_MODELVIEW);
             glPushMatrix();
             glLoadIdentity();
@@ -57,7 +57,7 @@ public:
 
         int colsNo = 0;
         for(int x = this->originx; x <= this->originx + this->cols*gridSpacing && colsNo<=this->cols ;x+=gridSpacing){
-            glColor3f(1.0,0.0,0.0);
+            glColor3f(0.4,0.4,0.4);
             glBegin(GL_LINES);
                 glVertex2i(x,this->originy);
                 glVertex2i(x,this->originy + gridSpacing*this->cols);
@@ -67,7 +67,7 @@ public:
 
         int rowsNo = 0;
         for(int y = this->originy; y <= this->originy + this->rows*gridSpacing && rowsNo<= this->rows ;y+=gridSpacing){
-            glColor3f(1.0,0.0,0.0);
+            glColor3f(0.4,0.4,0.4);
             glBegin(GL_LINES);
                 glVertex2i(this->originx,y);
                 glVertex2i(this->originx + gridSpacing*this->rows,y);
@@ -76,19 +76,32 @@ public:
         }
 
     }
-    void drawSegmentLine3A(int x0, int y0, int xn, int yn) {
+    void drawSegmentLine3A(int x0, int y0, int xn, int yn,int thickness) {
+
+        pair<int,int> lineCoordStart = this->transformPixels(x0,this->cols - y0);
+        pair<int,int> lineCoordEnd = this->transformPixels(xn,this->cols - yn);
+
+        glColor3f(1.0,0.0,0.0);
+        glBegin(GL_LINES);
+        glVertex2i(lineCoordStart.first,lineCoordStart.second);
+        glVertex2i(lineCoordEnd.first,lineCoordEnd.second);
+        glEnd();
 
         int dx = xn - x0, dy = yn - y0;
-
         int d = 2* dy - dx;
         int dE = 2 * dy;
         int dNE = 2 * (dy - dx);
 
         int x = x0,y = y0;
 
+        for(int i = max(0, y - thickness); i<= min(y + thickness,this->rows); ++i) {
+                this->writePixel(x,i);
+        }
         this->writePixel(x,y);
 
+
         while(x < xn){
+
             if (d <= 0) {
                 d += dE;
                 x++;
@@ -99,32 +112,52 @@ public:
                 y++;
             }
             this->writePixel(x,y);
+
+            for(int i = max(0, y - thickness); i<= min(y + thickness,this->rows); ++i) {
+                this->writePixel(x,i);
+            }
         }
     }
 
-    void drawSegmentLine3B(int x0, int y0, int xn, int yn) {
+    void drawSegmentLine3B(int x0, int y0, int xn, int yn,int thickness) {
+
+        pair<int,int> lineCoordStart = this->transformPixels(x0,this->cols - y0);
+        pair<int,int> lineCoordEnd = this->transformPixels(xn,this->cols - yn);
+
+        glColor3f(1.0,0.0,0.0);
+        glBegin(GL_LINES);
+        glVertex2i(lineCoordStart.first,lineCoordStart.second);
+        glVertex2i(lineCoordEnd.first,lineCoordEnd.second);
+        glEnd();
 
         int dx = xn - x0, dy = yn - y0;
-
-        int d = 2* dy - dx;
+        int d = 2* dy + dx;
         int dE = 2 * dy;
-        int dSE = 2 * (dy - dx);
+        int dSE = 2 * (dy + dx);
 
         int x = x0,y = y0;
+
+        for(int i = max(0, y - thickness); i<= min(y + thickness,this->rows); ++i) {
+                this->writePixel(x,i);
+        }
+
         this->writePixel(x,y);
 
         while(x < xn){
-
-            if(d >= 0){
+            if (d > 0) {
                 d += dE;
                 x++;
             }
-            else{
-                d -= dSE;
+            else {
+                d += dSE;
                 x++;
                 y--;
             }
             this->writePixel(x,y);
+
+            for(int i = max(0, y - thickness); i<= min(y + thickness,this->rows); ++i) {
+                this->writePixel(x,i);
+            }
         }
     }
 
@@ -169,8 +202,8 @@ void Display(void) {
    gc.setRows(15);
    glClear(GL_COLOR_BUFFER_BIT);
    gc.drawCartGrid();
-   gc.drawSegmentLine3B(0,15,15,10);
-   gc.drawSegmentLine3A(0,0,15,7);
+   gc.drawSegmentLine3B(0,15,15,10,1);
+   gc.drawSegmentLine3A(0,0,15,7,0);
    glFlush();
 }
 

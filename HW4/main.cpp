@@ -76,6 +76,56 @@ public:
         }
 
     }
+
+    void drawCirclePoints3(int x,int y)
+    {
+
+        this->writePixel(x,y);
+        this->writePixel(-x,y);
+        this->writePixel(x,-y);
+        this->writePixel(-x,-y);
+
+        cout<<x<<" "<<y<<endl;
+
+        if(x != y)
+        {
+            this->writePixel(y,x);
+            this->writePixel(-y,x);
+            this->writePixel(y,-x);
+            this->writePixel(-y,-x);
+        }
+
+    }
+
+    void drawCircle4(int radius,int circlex)
+    {
+        int x = circlex,y = circlex + radius;
+        int d = 1 - radius;
+        int dE = 3,dSE = -2 * radius + 5;
+
+        this->drawCirclePoints3(x,y);
+
+        while(y > x)
+        {
+            if(d < 0)
+            {
+                d += dE;
+                dE += 2;
+                dSE += 2;
+            }
+            else
+            {
+                d += dSE;
+                dE += 2;
+                dSE += 4;
+                y--;
+
+            }
+            x++;
+            this->drawCirclePoints3(x,y);
+        }
+    }
+
     void drawSegmentLine3A(int x0, int y0, int xn, int yn,int thickness) {
 
         pair<int,int> lineCoordStart = this->transformPixels(x0,this->cols - y0);
@@ -162,7 +212,18 @@ public:
     }
 
 
+
     pair<int,int> transformPixels(int i,int j){
+
+        if(i < 0)
+        {
+           i += this->rows;
+        }
+        if(j < 0)
+        {
+           j += this->cols;
+        }
+
         int xi = this->originx + this->gridSpacing * i;
         int yj = this->originy + this->gridSpacing * j;
 
@@ -202,8 +263,9 @@ void Display(void) {
    gc.setRows(15);
    glClear(GL_COLOR_BUFFER_BIT);
    gc.drawCartGrid();
-   gc.drawSegmentLine3B(0,15,15,10,1);
-   gc.drawSegmentLine3A(0,0,15,7,0);
+   //gc.drawSegmentLine3B(0,15,15,10,1);
+   //gc.drawSegmentLine3A(0,0,15,7,0);
+   gc.drawCircle4(14,3);
    glFlush();
 }
 
